@@ -1,0 +1,20 @@
+<resources>
+    <string name="app_name">Projektmunka</string>
+    <string name="action_settings">Settings</string>
+    <!-- Strings used for fragments for navigation -->
+    <string name="first_fragment_label">First Fragment</string>
+    <string name="second_fragment_label">Second Fragment</string>
+    <string name="next">Next</string>
+    <string name="previous">Previous</string>
+
+    <string name="register">Regisztráció</string>
+    <string name="login">Vissza a bejelentkezéshez</string>
+
+    <string name="email">Email</string>
+    <string name="username">Felhasználónév</string>
+    <string name="password">Jelszó</string>
+    <string name="confirmpass">Jelszó megerősítése</string>
+    <string name="loginOrRegister"> Kérlek lépj be vagy regisztrálj</string>
+
+
+</resources>
