@@ -35,6 +35,14 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
+        if (currentUser != null) {
+            Intent intent = new Intent(MainActivity.this, FilmList.class);
+            startActivity(intent);
+            finish();
+            return;
+        }
+
         mAuth = FirebaseAuth.getInstance();
 
         userNameEditText = findViewById(R.id.editTextUsername);
@@ -42,7 +50,7 @@ public class MainActivity extends AppCompatActivity {
         passwordEditText = findViewById(R.id.editTextPassword);
         passwordConfirmEditText = findViewById(R.id.editTextConfirmPassword);
         registerButton = findViewById(R.id.register);
-        loginButton = findViewById(R.id.login); // Initialize loginButton
+        loginButton = findViewById(R.id.login);
 
         registerButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -51,7 +59,6 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        // Set OnClickListener for loginButton
         loginButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -60,6 +67,7 @@ public class MainActivity extends AppCompatActivity {
             }
         });
     }
+
 
     private void registerUser() {
         final String userName = userNameEditText.getText().toString().trim();

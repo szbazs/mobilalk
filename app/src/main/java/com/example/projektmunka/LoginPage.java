@@ -30,6 +30,9 @@ public class LoginPage extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.page_login);
 
+        navbar.setupNavbar(this);
+
+
         mAuth = FirebaseAuth.getInstance();
 
         editTextLoginUsername = findViewById(R.id.editTextLoginUsername);
@@ -51,7 +54,7 @@ public class LoginPage extends AppCompatActivity {
                                     Log.d("LoginPage", "signInWithEmail:success");
                                     FirebaseUser user = mAuth.getCurrentUser();
                                     Toast.makeText(LoginPage.this, "Sikeres bejelentkezés!", Toast.LENGTH_SHORT).show();
-                                    Intent intent = new Intent(LoginPage.this, ShopListActivity.class);
+                                    Intent intent = new Intent(LoginPage.this, FilmList.class);
                                     startActivity(intent);
                                     finish();
                                 } else {

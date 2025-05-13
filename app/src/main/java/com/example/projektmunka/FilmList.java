@@ -1,11 +1,14 @@
 package com.example.projektmunka;
 
 import androidx.appcompat.app.AppCompatActivity;
+
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.ImageView;
+import android.widget.Button;
 import android.view.ViewGroup;
 import android.view.Gravity;
 import android.graphics.Bitmap;
@@ -22,15 +25,18 @@ import java.io.InputStreamReader;
 import android.os.Handler;
 import android.os.Looper;
 
-public class ShopListActivity extends AppCompatActivity {
+public class FilmList extends AppCompatActivity {
 
-    private static final String LOG_TAG = ShopListActivity.class.getName();
+
+    private static final String LOG_TAG = FilmList.class.getName();
     private FirebaseUser user;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_shop_list);
+        setContentView(R.layout.list_film);
+
+        navbar.setupNavbar(this);
 
         user = FirebaseAuth.getInstance().getCurrentUser();
         if (user != null) {
@@ -42,6 +48,9 @@ public class ShopListActivity extends AppCompatActivity {
 
         fetchMovies();
     }
+
+
+
 
     private void fetchMovies() {
         String apiKey = "d38192976abfe099330634d8e1b58f00";
@@ -72,6 +81,7 @@ public class ShopListActivity extends AppCompatActivity {
                         String title = movie.optString("title");
                         String overview = movie.optString("overview");
                         String posterPath = movie.optString("poster_path");
+                        String filmId = movie.optString("id"); // Getting the movie ID
 
                         LinearLayout movieItem = new LinearLayout(this);
                         movieItem.setOrientation(LinearLayout.VERTICAL);
@@ -105,9 +115,19 @@ public class ShopListActivity extends AppCompatActivity {
                         overviewView.setTextSize(14);
                         overviewView.setPadding(0, 8, 0, 8);
 
+                        // Create a button to go to the ReservationType activity
+                        Button reserveButton = new Button(this);
+                        reserveButton.setText("Reserve or Buy");
+                        reserveButton.setOnClickListener(v -> {
+                            Intent intent = new Intent(FilmList.this, ReservationType.class);
+                            intent.putExtra("filmId", filmId); // Pass film ID to the ReservationType activity
+                            startActivity(intent);
+                        });
+
                         movieItem.addView(imageView);
                         movieItem.addView(titleView);
                         movieItem.addView(overviewView);
+                        movieItem.addView(reserveButton); // Add the button to the movie item
                         moviesLayout.addView(movieItem);
                     }
                 });

@@ -26,7 +26,8 @@
             </intent-filter>
         </activity>
         <activity android:name=".LoginPage" />
-        <activity android:name=".ShopListActivity" />
+        <activity android:name=".FilmList" />
+        <activity android:name=".ReservationType" />
     </application>
 
 </manifest>
