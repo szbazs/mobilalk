@@ -59,7 +59,7 @@ public class LoginPage extends AppCompatActivity {
                                     finish();
                                 } else {
                                     Log.w("LoginPage", "signInWithEmail:failure", task.getException());
-                                    Toast.makeText(LoginPage.this, "Authentication failed.",
+                                    Toast.makeText(LoginPage.this, "Autentikáció sikertelen.",
                                             Toast.LENGTH_SHORT).show();
                                 }
                             }

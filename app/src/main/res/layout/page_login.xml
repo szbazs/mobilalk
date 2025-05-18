@@ -66,6 +66,8 @@
         android:layout_marginTop="32dp"
         android:layout_marginEnd="32dp"
         android:text="Bejelentkezés"
+        android:backgroundTint="#383838"
+        android:textColor="#FFFFFF"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/textInputLayoutLoginPassword" />
@@ -78,9 +80,12 @@
         android:layout_marginTop="88dp"
         android:layout_marginEnd="32dp"
         android:text="Vissza a regisztrációra"
+        android:backgroundTint="#383838"
+        android:textColor="#FFFFFF"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/textInputLayoutLoginPassword" />
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>

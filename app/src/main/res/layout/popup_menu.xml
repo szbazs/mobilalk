@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:clickable="true"
+    android:focusable="true">
+
+    <LinearLayout
+        android:id="@+id/menu_container"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:background="#ffffff"
+        android:elevation="8dp"
+        android:paddingTop="0dp" >
+
+        <include
+            android:id="@+id/navbar"
+            layout="@layout/navbar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+
+        <Button
+            android:id="@+id/menu_film_list_button"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Filmek"
+            android:padding="16dp"
+            android:gravity="start"
+            android:background="?android:attr/selectableItemBackground"
+            android:textSize="18sp" />
+
+        <Button
+            android:id="@+id/menu_logout_button"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Kijelentkezés"
+            android:padding="16dp"
+            android:gravity="start"
+            android:background="?android:attr/selectableItemBackground"
+            android:textSize="18sp" />
+
+        <Button
+            android:id="@+id/menu_reservations_button"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Foglalások"
+            android:padding="16dp"
+            android:gravity="start"
+            android:background="?android:attr/selectableItemBackground"
+            android:textSize="18sp" />
+
+    </LinearLayout>
+
+</FrameLayout>

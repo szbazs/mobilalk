@@ -9,12 +9,17 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.ImageView;
 import android.widget.Button;
-import android.view.ViewGroup;
-import android.view.Gravity;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.view.animation.AnimationUtils;
+import android.view.animation.LayoutAnimationController;
+import android.view.LayoutInflater;
+
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.FirebaseApp;
+
 import org.json.JSONArray;
 import org.json.JSONObject;
 import java.io.InputStream;
@@ -24,12 +29,16 @@ import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import android.os.Handler;
 import android.os.Looper;
+import android.widget.Toast;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class FilmList extends AppCompatActivity {
-
-
     private static final String LOG_TAG = FilmList.class.getName();
+    private FirebaseAuth mAuth;
     private FirebaseUser user;
+    private FirebaseFirestore db;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -41,16 +50,22 @@ public class FilmList extends AppCompatActivity {
         user = FirebaseAuth.getInstance().getCurrentUser();
         if (user != null) {
             Log.d(LOG_TAG, "Authenticated user!");
+            Toast.makeText(this, "Hitelesített felhasználó!", Toast.LENGTH_SHORT).show();
         } else {
             Log.d(LOG_TAG, "Unauthenticated user!");
+            Toast.makeText(this, "Nem hitelesített felhasználó!", Toast.LENGTH_SHORT).show();
             finish();
         }
 
+        if (FirebaseApp.getApps(this).isEmpty()) {
+            FirebaseApp.initializeApp(this);
+        }
+        mAuth = FirebaseAuth.getInstance();
+        user = mAuth.getCurrentUser();
+        db = FirebaseFirestore.getInstance();
+
         fetchMovies();
     }
-
-
-
 
     private void fetchMovies() {
         String apiKey = "d38192976abfe099330634d8e1b58f00";
@@ -62,81 +77,71 @@ public class FilmList extends AppCompatActivity {
                 HttpURLConnection connection = (HttpURLConnection) url.openConnection();
                 connection.setRequestMethod("GET");
 
-                BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
-                StringBuilder response = new StringBuilder();
-                String line;
-                while ((line = reader.readLine()) != null) {
-                    response.append(line);
-                }
-                reader.close();
-
-                JSONObject jsonObject = new JSONObject(response.toString());
-                JSONArray results = jsonObject.getJSONArray("results");
-
-                Handler mainHandler = new Handler(Looper.getMainLooper());
-                mainHandler.post(() -> {
-                    LinearLayout moviesLayout = findViewById(R.id.moviesLayout);
-                    for (int i = 0; i < results.length(); i++) {
-                        JSONObject movie = results.optJSONObject(i);
-                        String title = movie.optString("title");
-                        String overview = movie.optString("overview");
-                        String posterPath = movie.optString("poster_path");
-                        String filmId = movie.optString("id"); // Getting the movie ID
-
-                        LinearLayout movieItem = new LinearLayout(this);
-                        movieItem.setOrientation(LinearLayout.VERTICAL);
-                        movieItem.setLayoutParams(new ViewGroup.LayoutParams(
-                                ViewGroup.LayoutParams.MATCH_PARENT,
-                                ViewGroup.LayoutParams.WRAP_CONTENT
-                        ));
-                        movieItem.setPadding(0, 24, 0, 24);
-                        movieItem.setGravity(Gravity.CENTER_HORIZONTAL);
-
-                        ImageView imageView = new ImageView(this);
-                        imageView.setLayoutParams(new ViewGroup.LayoutParams(500, 750));
-                        loadPosterImage(imageView, posterPath);
-
-                        TextView titleView = new TextView(this);
-                        titleView.setLayoutParams(new ViewGroup.LayoutParams(
-                                ViewGroup.LayoutParams.MATCH_PARENT,
-                                ViewGroup.LayoutParams.WRAP_CONTENT
-                        ));
-                        titleView.setText(title);
-                        titleView.setTextSize(20);
-                        titleView.setGravity(Gravity.CENTER_HORIZONTAL);
-                        titleView.setPadding(0, 16, 0, 8);
-
-                        TextView overviewView = new TextView(this);
-                        overviewView.setLayoutParams(new ViewGroup.LayoutParams(
-                                ViewGroup.LayoutParams.MATCH_PARENT,
-                                ViewGroup.LayoutParams.WRAP_CONTENT
-                        ));
-                        overviewView.setText(overview);
-                        overviewView.setTextSize(14);
-                        overviewView.setPadding(0, 8, 0, 8);
-
-                        // Create a button to go to the ReservationType activity
-                        Button reserveButton = new Button(this);
-                        reserveButton.setText("Reserve or Buy");
-                        reserveButton.setOnClickListener(v -> {
-                            Intent intent = new Intent(FilmList.this, ReservationType.class);
-                            intent.putExtra("filmId", filmId); // Pass film ID to the ReservationType activity
-                            startActivity(intent);
-                        });
-
-                        movieItem.addView(imageView);
-                        movieItem.addView(titleView);
-                        movieItem.addView(overviewView);
-                        movieItem.addView(reserveButton); // Add the button to the movie item
-                        moviesLayout.addView(movieItem);
+                int responseCode = connection.getResponseCode();
+                if (responseCode == HttpURLConnection.HTTP_OK) {
+                    BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+                    StringBuilder response = new StringBuilder();
+                    String line;
+                    while ((line = reader.readLine()) != null) {
+                        response.append(line);
                     }
-                });
+                    reader.close();
+
+                    JSONObject jsonObject = new JSONObject(response.toString());
+                    JSONArray results = jsonObject.getJSONArray("results");
+
+                    Handler mainHandler = new Handler(Looper.getMainLooper());
+                    mainHandler.post(() -> {
+                        LinearLayout moviesLayout = findViewById(R.id.moviesLayout);
+
+                        LayoutAnimationController controller =
+                                AnimationUtils.loadLayoutAnimation(this, R.anim.layout_animation_fall_down);
+
+                        moviesLayout.setLayoutAnimation(controller);
+
+                        moviesLayout.removeAllViews();
+
+                        LayoutInflater inflater = LayoutInflater.from(this);
+
+                        for (int i = 0; i < results.length(); i++) {
+                            JSONObject movie = results.optJSONObject(i);
+                            if (movie != null) {
+                                String title = movie.optString("title");
+                                String overview = movie.optString("overview");
+                                String posterPath = movie.optString("poster_path");
+                                String filmId = movie.optString("id");
+
+                                LinearLayout movieItem = (LinearLayout) inflater.inflate(R.layout.list_item_movie, moviesLayout, false);
+
+                                ImageView imageView = movieItem.findViewById(R.id.moviePosterImageView);
+                                TextView titleView = movieItem.findViewById(R.id.movieTitleTextView);
+                                Button reserveButton = movieItem.findViewById(R.id.reserveButton);
+
+                                titleView.setText(title);
+                                loadPosterImage(imageView, posterPath);
+
+                                reserveButton.setOnClickListener(v -> {
+                                    Intent intent = new Intent(FilmList.this, ReservationType.class);
+                                    intent.putExtra("filmId", filmId);
+                                    startActivity(intent);
+                                });
+
+                                moviesLayout.addView(movieItem);
+                            }
+                        }
+                    });
+
+                } else {
+                    Log.e(LOG_TAG, "HTTP error code: " + responseCode);
+                }
+
 
             } catch (Exception e) {
                 Log.e(LOG_TAG, "Exception: ", e);
             }
         }).start();
     }
+
 
     private void loadPosterImage(ImageView imageView, String posterPath) {
         new Thread(() -> {
